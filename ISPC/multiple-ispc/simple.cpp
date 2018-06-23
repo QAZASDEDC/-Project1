@@ -1,0 +1,39 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <windows.h>
+#define N 15
+// Include the header file that the ispc compiler generates
+#include "simple_ispc.h"
+using namespace ispc;
+
+int main() {
+	int vin1[N*N], vin2[N*N];
+	int vout[N*N];
+	for (int i = 0; i < N*N; ++i) {
+		vin1[i] = 1;
+		vin2[i] = 1;
+	}
+		
+	//计时用，精确到ms 
+	LARGE_INTEGER nFreq;
+	LARGE_INTEGER nBeginTime;
+	LARGE_INTEGER nEndTime;
+	QueryPerformanceFrequency(&nFreq);
+	QueryPerformanceCounter(&nBeginTime);
+    // Initialize input buffer
+    // Call simple() function from simple.ispc file
+    simple(vin1, vin2, vout, N);
+
+	QueryPerformanceCounter(&nEndTime);
+
+    // Print results
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			printf("%d ", vout[i*N + j]);
+		}
+		printf("\n");
+	}
+	printf("time = %lfms\n", (double)(nEndTime.QuadPart - nBeginTime.QuadPart) / (double)nFreq.QuadPart * 1000);
+	system("pause"); 
+    return 0;
+}
